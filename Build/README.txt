@@ -1,0 +1,4 @@
+"Magic-Generator.exe" Program Controls:
+>1) Immediately on launch, choose whether to automatically stop searching once both the rook and bishop tables reach their known theoretical-optimal size (`Y`), or keep searching indefinitely for further improvements (until manually stopped) (`N`). The program will then instantly pre-compute all rook & bishop move and blocker masks for all 64 squares.
+>2) Hit ENTER to begin the magic number search. The console will update with search diagnostics, along with the best magic numbers found so far. Hit ENTER again to stop at any time.
+>3) Once the search stops, the final magic numbers, shifts, and move-map hash arrays for all 64 rook and bishop squares are serialised to a binary output file, ready for immediate loading by a chess engine.
