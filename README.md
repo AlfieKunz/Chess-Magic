@@ -13,9 +13,10 @@ Rather than traditional ray-casting methods, where a sliding piece's legal moves
 The program outputs a serialised binary file (at the executable path) containing two arrays of 'MagicInfo' structures (see source code for more details), the first for rooks and the second for bishops. This structure is in the following format:
 ```vb
 Public Structure MagicInfo
-    Public Magic As UInt64     '64-bit unsigned magic number, with 87.5% set sparsity and always containing at least 6 set bits.
-    Public Shift As Integer    'Number of places to shift the "Magic * Blocker Mask" key, to produce an entry in the array of legal moves.
-    Public MoveMap() As UInt64 'Hashed array of legal moves, containing the movement map for a rook at each location with specific blocker patterns.
+    Public MovementMask As UInt64 'Holds the move map of a piece with no blockers, but cutting the final square off for each edge. Allows for easy ANDing with the occupancy mask. 
+    Public Magic As UInt64 '64-bit unsigned magic number, with 87.5% set sparsity and always containing at least 6 set bits.
+    Public Shift As Integer 'Number of places to shift the "Magic * Blocker Mask" key, to produce an entry in the array of legal moves.
+    Public MoveMap() As UInt64 'Hashed array of legal moves, containing the movement map for a rook at each location with specific blocker pattern.
 End Structure
 ```
 

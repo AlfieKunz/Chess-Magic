@@ -9,6 +9,7 @@ Imports System.Threading
 
 'Condensed Magic and Mask Info for efficient OOP storage. The exported data is a serialised array of 'MagicInfo', one structure for each square.
 Public Structure MagicInfo
+    Public MovementMask As UInt64 'Holds the move map of a piece with no blockers, but cutting the final square off for each edge. Allows for easy ANDing with the occupancy mask. 
     Public Magic As UInt64 '64-bit unsigned magic number, with 87.5% set sparsity and always containing at least 6 set bits.
     Public Shift As Integer 'Number of places to shift the "Magic * Blocker Mask" key, to produce an entry in the array of legal moves.
     Public MoveMap() As UInt64 'Hashed array of legal moves, containing the movement map for a rook at each location with specific blocker pattern.
@@ -85,6 +86,7 @@ Module Program
         Dim RookPieceMasks(63)() As MaskInfo
         For n = 0 To 63
             Dim BaseTFTable As UInt64 = CreateRookMoveMap(n, 0UL, False)
+            MagicRookInfo(n).MovementMask = BaseTFTable
             RookPieceMasks(n) = CreatePieceMasks(BaseTFTable, n, True)
         Next
         Timer.Stop()
@@ -97,6 +99,7 @@ Module Program
         Dim BishopPieceMasks(63)() As MaskInfo
         For n = 0 To 63
             Dim BaseTFTable As UInt64 = CreateBishopMoveMap(n, 0UL, False)
+            MagicBishopInfo(n).MovementMask = BaseTFTable
             BishopPieceMasks(n) = CreatePieceMasks(BaseTFTable, n, False)
         Next
         Timer.Stop()
@@ -246,6 +249,7 @@ Module Program
             Using BW As New BinaryWriter(FS)
                 For Each MagicData In {MagicRookInfo, MagicBishopInfo}
                     For i = 0 To 63
+                        BW.Write(MagicData(i).MovementMask)
                         BW.Write(MagicData(i).Magic)
                         BW.Write(MagicData(i).Shift)
                         BW.Write(MagicData(i).MoveMap.Length)
