@@ -11,11 +11,15 @@
     <RemoveIntegerChecks>True</RemoveIntegerChecks>
     <DefineDebug>False</DefineDebug>
     <DefineTrace>False</DefineTrace>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <RemoveIntegerChecks>True</RemoveIntegerChecks>
     <DefineTrace>False</DefineTrace>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
 
 </Project>

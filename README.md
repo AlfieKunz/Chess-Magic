@@ -7,7 +7,7 @@
 
 ---
 
-A lightweight tool built to brute-force search and pre-compute the **magic numbers** used for a chess computer's 'fancy magic' bitboard move generation (specifically, sliding pieces such as rooks, bishops, and queens). Heavily optimised with multithreading, generational and perfect collision resolution, and a hand-written RNG, allowing the program to find the known 'fancy magic' **theoretical optimal** size in **under 1.5s**.  
+A lightweight tool built to brute-force search and pre-compute the **magic numbers** used for a chess computer's 'fancy magic' bitboard move generation (specifically, sliding pieces such as rooks, bishops, and queens). Heavily optimised with multithreading, generational and perfect collision resolution, and a hand-written RNG, allowing the program to find the known 'fancy magic' **theoretical optimal** size in **under 0.6s**.  
 Rather than traditional ray-casting methods, where a sliding piece's legal moves are generated via 4 for-loops in each direction (stopping once we reach a piece, or the edge of the board), 'magic' move generation **pre-computes** a massive **hashed lookup table** of all the pseudo-legal moves each of the sliding pieces can make (given a key, that being the bitmap of other pieces that lie in the sliding piece's rays), that can be retrieved in O(1). This program performs its own multithreaded search **from scratch**, continuously hunting for smaller and smaller perfect-hashing tables via a live, colour-coded terminal dashboard, before exporting the final results as a compact binary file.
 
 The program outputs a serialised binary file (at the executable path) containing two arrays of 'MagicInfo' structures (see source code for more details), the first for rooks and the second for bishops. This structure is in the following format:
@@ -35,7 +35,7 @@ This project is written primarily in VB.NET as a Visual Studio console applicati
 ✅ Full ray-casting pre-computed move generation for both rooks and bishops (for efficient lookups during magic number generation).  
 ✅ From-scratch derivation of each square's "relevant occupancy" mask (the 'key' as mentioned earlier, containing possible blocking piece locations), taking care to exclude edge squares and pairing of all 2^n subsets with their resulting legal-move bitboard.  
 ✅ Hand-written 'Xoshiro256' PRNG (SplitMix64-seeded for a well-distributed initial state) for each thread to avoid correlation.  
-✅ Ultra-fast generation and processing (~18M per second) of magic numbers, finding the fancy optimal storage solution in under 1.5s (800kB of storage for rook moves, 41kB for bishop moves).  
+✅ Ultra-fast generation and processing (~48M per second) of magic numbers, finding the fancy optimal storage solution in under 0.6s (800kB of storage for rook moves, 41kB for bishop moves).  
 ✅ Parsing of ill-fit magic number candidates immediately upon generation (producing sparse numbers whilst rejecting whose with few set bits).  
 ✅ 'Greedy shrink' searching strategy, tightening the shift value by 1 bit immediately upon spotting a collision-free magic/shift pairing for some square.  
 ✅ 'Generation-stamped' collision resolutions: stores a time-stamp for each hashed value, allowing stale entries to be safely overwritten instead of restarting the search.  
@@ -49,7 +49,7 @@ This project is written primarily in VB.NET as a Visual Studio console applicati
 
 ## Project Showcase
 
-> **Project Demo:** You can see this project live directly through the [**project build**](https://drive.google.com/open?id=1XNjrBzgGa3Rgt-1cntzvTwKjdx_Q30mW&u) (Intel 32/64-bit). Simply click the 'Download All' button in the link attached, unzip and run the "Magic-Generator.exe" application.
+> **Project Demo:** You can see this project live directly through the [**project build**](https://drive.google.com/open?id=1XNjrBzgGa3Rgt-1cntzvTwKjdx_Q30mW&u) (64-bit). Simply click the 'Download All' button in the link attached, unzip and run the "Magic-Generator.exe" application.
 
 > **Program Controls:**
 >1) Immediately on launch, choose whether to automatically stop searching once both the rook and bishop tables reach their known theoretical-optimal size (`Y`), or keep searching indefinitely for further improvements (until manually stopped) (`N`). The program will then instantly pre-compute all rook & bishop move and blocker masks for all 64 squares.
@@ -66,13 +66,13 @@ For each square, we construct a bitboard called the relevant occupancy mask, whi
 
 This forms the algorithm to efficiently store all legal moves: for each square, we start with a massive array and test thousands of randomly-generated magic numbers such that every occupancy mask for that cell has a unique entry. Once we have an injective map, we shrink the array by a factor of two (or rather, incrementing the number we right-shift by) and keep searching for magic numbers, until we hit a dead end. 'Fancy' magic bitboards improve on this concept by allocating a shift value for each square (rather than a global value): this allows for pieces which have few legal moves (eg: a bishop trapped on a1, vs a rook on e5) to have their moves much more efficiently stored, meaning our pre-computed tables fit effortlessly into L2 CPU cache.
 
-The known theoretical limit for how tightly we can pack our array is by using a 2^12 array for the rook, and a 2^9 array for the bishop (giving table sizes of 800kB and 41kB respectively). My program is able to find this optimal solution in under **1.5s** of searching.
+The known theoretical limit for how tightly we can pack our array is by using a 2^12 array for the rook, and a 2^9 array for the bishop (giving table sizes of 800kB and 41kB respectively). My program is able to find this optimal solution in under **0.6s** of searching.
 
 ---
 
 ## Installation and Folder Structure
 
-### Required Software: Visual Studio (.NET 8.0).
+### Required Software: Visual Studio (.NET 8.0, x64).
 
 To install, simply clone this repository using the following terminal prompts.
 ```bash
